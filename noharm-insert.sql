@@ -1153,3 +1153,21 @@ INSERT INTO demo.intervencao (fkpresmed, nratendimento, update_by, idmotivointer
 	(35, 4, 1, ARRAY[12], 'N', '<p>Medicamento de alta vigil&acirc;ncia - VARFARINA - com dose acima da usual.</p><p>Favor revisar.</p><p>Att, Farm...</p><p>Ramal...</p>'),
 	(34, 5, 1, ARRAY[12], 'N', '<p>A dose m&aacute;xima di&aacute;ria do PARACETAMOL &eacute; de 4g.</p><p>Favor rever frequ&ecirc;ncia (frequ&ecirc;ncia usual 6/6h)</p><p>Att, Farm...</p><p>Ramal...</p>'),
 	(23, 6, 1, ARRAY[15], 'N', '<p>A dose m&aacute;xima di&aacute;ria da HIOSCINA &eacute; de 100mg.</p><p>Frequ&ecirc;ncia usual &eacute; 6/6h.</p><p>Favor rever frequ&ecirc;ncia.</p><p>Att, Farm...</p><p>Ramal...</p>');
+
+INSERT INTO demo.nutricional_cid_gravidade VALUES
+  ('C', 2, 'Neoplasias malignas'),
+  ('D', 2, 'Neoplasias benignas com impacto nutricional'),
+  ('J', 1, 'Respiratorio - ver override para J18, J44, J96'),
+  ('K', 1, 'Digestivo - ver override para K85, K57'),
+  ('I', 1, 'Circulatorio - ver override para I63, I21, I50'),
+  ('N', 1, 'Renal'),
+  ('E', 1, 'Endocrino e metabolico'),
+  ('M', 1, 'Musculoesqueletico'),
+  ('F', 0, 'Transtornos mentais'),
+  ('Z', 0, 'Fatores que influenciam a saude');
+
+INSERT INTO demo.nutricional_cid_override VALUES
+  ('J18', 2), ('J96', 2), ('J44', 1),
+  ('K85', 2), ('K92', 2), ('K57', 1),
+  ('I63', 2), ('I21', 2), ('I50', 1), ('I70', 1);
+
