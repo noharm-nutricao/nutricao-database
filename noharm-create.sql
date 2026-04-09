@@ -564,13 +564,22 @@ create table demo."relatorio" (
 );
 
 CREATE TABLE demo.nutricional_nrs (
-  id                  SERIAL PRIMARY KEY,
-  nratendimento       INTEGER NOT NULL REFERENCES demo.pessoa(nratendimento),
-  perda_peso_pct      NUMERIC(5,2),
-  perda_peso_meses    SMALLINT,
-  ingestao_pct        SMALLINT CHECK (ingestao_pct BETWEEN 0 AND 100),
-  updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-  created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+id bigserial PRIMARY KEY,
+
+nratendimento       INTEGER NOT NULL REFERENCES demo.pessoa(nratendimento),
+
+triagem_imc_baixo boolean NOT NULL,
+triagem_perda_peso boolean NOT NULL,
+triagem_ingestao_reduzida boolean NOT NULL,
+triagem_doenca_grave boolean NOT NULL,
+
+score_comprometimento smallint,
+score_gravidade smallint,
+idade_maior_70 boolean,
+
+updated_at          TIMESTAMPTZ NOT NULL,
+created_at          TIMESTAMPTZ NOT NULL
+
 );
 
 CREATE TABLE demo.nutricional_cid_gravidade (
@@ -671,6 +680,7 @@ CREATE SEQUENCE demo.evolucao_fkevolucao_seq
 -- NUTRICIONAL INDEXES
 CREATE INDEX idx_nrs_nratendimento ON demo.nutricional_nrs(nratendimento);
 CREATE INDEX idx_nrs_updated_at    ON demo.nutricional_nrs(updated_at);
+CREATE INDEX demo_nutricional_nrs_atendimento_idx ON demo.nutricional_nrs (nratendimento, updated_at DESC);
 
 CREATE INDEX idx_triagem_nratendimento ON demo.nutricional_triagem(nratendimento);
 
