@@ -582,17 +582,6 @@ created_at          TIMESTAMPTZ NOT NULL
 
 );
 
-CREATE TABLE demo.nutricional_cid_gravidade (
-  prefixo   CHAR(1) PRIMARY KEY,
-  score_nrs SMALLINT NOT NULL CHECK (score_nrs BETWEEN 0 AND 2),
-  justif    TEXT
-);
-
-CREATE TABLE demo.nutricional_cid_override (
-  prefixo3  CHAR(3) PRIMARY KEY,
-  score_nrs SMALLINT NOT NULL CHECK (score_nrs BETWEEN 0 AND 2)
-);
-
 CREATE TABLE demo.nutricional_triagem (
   id               SERIAL PRIMARY KEY,
   nratendimento    INTEGER NOT NULL REFERENCES demo.pessoa(nratendimento),

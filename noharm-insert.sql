@@ -1198,23 +1198,6 @@ INSERT INTO demo.nutricional_nrs (
 -- Atendimento 9999: caso de teste extremo (todos negativos)
 (9999, false, false, false, false, 0, 0, false, now(), now());
 
-INSERT INTO demo.nutricional_cid_gravidade VALUES
-  ('C', 2, 'Neoplasias malignas'),
-  ('D', 2, 'Neoplasias benignas com impacto nutricional'),
-  ('J', 1, 'Respiratorio - ver override para J18, J44, J96'),
-  ('K', 1, 'Digestivo - ver override para K85, K57'),
-  ('I', 1, 'Circulatorio - ver override para I63, I21, I50'),
-  ('N', 1, 'Renal'),
-  ('E', 1, 'Endocrino e metabolico'),
-  ('M', 1, 'Musculoesqueletico'),
-  ('F', 0, 'Transtornos mentais'),
-  ('Z', 0, 'Fatores que influenciam a saude');
-
-INSERT INTO demo.nutricional_cid_override VALUES
-  ('J18', 2), ('J96', 2), ('J44', 1),
-  ('K85', 2), ('K92', 2), ('K57', 1),
-  ('I63', 2), ('I21', 2), ('I50', 1), ('I70', 1);
-
 INSERT INTO demo.nutricional_triagem ( -- pacientes em ala geral
     nratendimento,
     protocolo,
@@ -1235,7 +1218,7 @@ INSERT INTO demo.nutricional_triagem ( -- pacientes em ala geral
 (8,  'NRS2002', 2, 3, 0, 5, true, 'al'),
 (9,  'NRS2002', 3, 1, 1, 5, true, 'al'),
 (12, 'NRS2002', 2, 1, 0, 3, true, 'al'),
-(100,'NRS2002',2,1,1,4,true,'al');
+(100,'NRS2002',2,1,1,4,true,'al'),
 (9999,'NRS2002',0, 0, 0, 0, true, 'bx');
 
 INSERT INTO demo.nutricional_triagem ( -- pacientes em uti
@@ -1261,8 +1244,8 @@ INSERT INTO demo.nutricional_triagem ( -- pacientes em uti
 (10, 'MNUTRIC', 0, 1, 1, 0, 0, 2, 'bx'),
 (11, 'MNUTRIC', 0, 3, 2, 1, 1, 7, 'al'),
 (12, 'MNUTRIC', 0, 1, 1, 1, 0, 3, 'bx'),
-(13, 'MNUTRIC', 1, 3, 3, 1, 1, 9, 'al');
-(14, 'MNUTRIC', 0, 2, 1, 0, 1, 4, 'bx');
+(13, 'MNUTRIC', 1, 3, 3, 1, 1, 9, 'al'),
+(9999, 'MNUTRIC', 0, 2, 1, 0, 1, 4, 'bx');
 
 INSERT INTO demo.nutricional_glim (
     nratendimento,
@@ -1319,8 +1302,8 @@ INSERT INTO demo.nutricional_glim (
  ARRAY['perda_peso','massa_muscular_baixa'],
  ARRAY['inflamacao','doenca_cronica'],
  'Desnutrição grave com múltiplos fatores etiológicos',
- 1);
- (14, 'mod',   ARRAY['perda_peso'], ARRAY['inflamacao'], 'Moderado', 1),
+ 1),
+ (9999, 'mod',   ARRAY['perda_peso'], ARRAY['inflamacao'], 'Moderado', 1);
 
 INSERT INTO demo.nutricional_avaliacao (
     nratendimento,
@@ -1333,7 +1316,7 @@ INSERT INTO demo.nutricional_avaliacao (
 ) VALUES
 (1, 1, 'Iniciar dieta enteral', '24h', 60, 2000, 90),
 (2, 1, 'Manter dieta oral', 'rotina', 85, 1800, 70),
-(3, 1, 'Suporte nutricional intensivo', '12h', 40, 2200, 110);
+(3, 1, 'Suporte nutricional intensivo', '12h', 40, 2200, 110),
 (4, 1, 'Ajustar dieta oral', '24h', 70, 1900, 80),
 (5, 1, 'Suplementação oral', '12h', 65, 2000, 85),
 (6, 1, 'Manter dieta oral', 'rotina', 85, 1800, 70),
@@ -1344,7 +1327,7 @@ INSERT INTO demo.nutricional_avaliacao (
 (11,1, 'Suporte intensivo', '12h', 35, 2300, 115),
 (12,1, 'Ajustar dieta oral', '24h', 70, 1900, 80),
 (13,1, 'Nutrição enteral', '12h', 30, 2400, 120),
-(14,1, 'Suplementação oral', '24h', 65, 2000, 85),
+(9999,1, 'Suplementação oral', '24h', 65, 2000, 85);
 
 INSERT INTO demo.nutricional_alerta (
     nratendimento,
@@ -1355,7 +1338,7 @@ INSERT INTO demo.nutricional_alerta (
 ) VALUES
 (1, 'clin', 'Baixa ingestão alimentar', 'amarelo', true),
 (2, 'lab',  'Albumina reduzida', 'laranja', true),
-(3, 'clin', 'Perda de peso acentuada', 'vermelho', true);
+(3, 'clin', 'Perda de peso acentuada', 'vermelho', true),
 (4, 'clin', 'Ingestão alimentar reduzida', 'amarelo', true),
 (5, 'lab',  'Deficiência de ferro', 'laranja', true),
 (6, 'clin', 'Perda de apetite', 'amarelo', true),
@@ -1366,4 +1349,4 @@ INSERT INTO demo.nutricional_alerta (
 (11,'lab',  'Albumina crítica', 'vermelho', true),
 (12,'clin', 'Ingestão insuficiente', 'amarelo', true),
 (13,'clin', 'Desnutrição grave', 'vermelho', true),
-(14,'lab',  'Baixa vitamina D', 'amarelo', true),
+(9999,'lab',  'Baixa vitamina D', 'amarelo', true);
