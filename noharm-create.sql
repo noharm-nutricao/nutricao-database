@@ -566,7 +566,7 @@ create table demo."relatorio" (
 CREATE TABLE demo.nutricional_nrs (
 id bigserial PRIMARY KEY,
 
-nratendimento       INTEGER NOT NULL REFERENCES demo.pessoa(nratendimento),
+nratendimento       BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
 
 triagem_imc_baixo boolean NOT NULL,
 triagem_perda_peso boolean NOT NULL,
@@ -584,7 +584,7 @@ created_at          TIMESTAMPTZ NOT NULL
 
 CREATE TABLE demo.nutricional_triagem (
   id               SERIAL PRIMARY KEY,
-  nratendimento    INTEGER NOT NULL REFERENCES demo.pessoa(nratendimento),
+  nratendimento    BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
   protocolo        VARCHAR(10) NOT NULL CHECK (protocolo IN ('MNUTRIC','NRS2002')),
   -- NRS-2002
   nrs_nut          SMALLINT CHECK (nrs_nut BETWEEN 0 AND 3),
@@ -611,7 +611,7 @@ CREATE TABLE demo.nutricional_triagem (
 
 CREATE TABLE demo.nutricional_glim (
   id            SERIAL PRIMARY KEY,
-  nratendimento INTEGER NOT NULL REFERENCES demo.pessoa(nratendimento),
+  nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
   diagnostico   VARCHAR(10) CHECK (diagnostico IN ('nd','mod','grave')),
   fenotipos     TEXT[],
   etiologias    TEXT[],
@@ -623,7 +623,7 @@ CREATE TABLE demo.nutricional_glim (
 
 CREATE TABLE demo.nutricional_avaliacao (
   id            SERIAL PRIMARY KEY,
-  nratendimento INTEGER NOT NULL REFERENCES demo.pessoa(nratendimento),
+  nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
   idusuario     INTEGER REFERENCES public.usuario(idusuario),
   conduta       TEXT,
   frequencia    VARCHAR(10) CHECK (frequencia IN ('12h','24h','48h','7d','rotina')),
@@ -635,7 +635,7 @@ CREATE TABLE demo.nutricional_avaliacao (
 
 CREATE TABLE demo.nutricional_d7 (
   id            SERIAL PRIMARY KEY,
-  nratendimento INTEGER NOT NULL REFERENCES demo.pessoa(nratendimento),
+  nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
   dt_prevista   TIMESTAMPTZ NOT NULL,
   concluido     BOOLEAN DEFAULT false,
   idusuario     INTEGER REFERENCES public.usuario(idusuario),
@@ -645,7 +645,7 @@ CREATE TABLE demo.nutricional_d7 (
 -- Sem valor numerico do exame (LGPD)
 CREATE TABLE demo.nutricional_alerta (
   id            SERIAL PRIMARY KEY,
-  nratendimento INTEGER NOT NULL REFERENCES demo.pessoa(nratendimento),
+  nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
   tipo          VARCHAR(5) CHECK (tipo IN ('lab','clin','rx')),
   descricao     TEXT,
   severidade    VARCHAR(10) CHECK (severidade IN ('amarelo','laranja','vermelho')),
