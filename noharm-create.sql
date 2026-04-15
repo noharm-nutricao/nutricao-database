@@ -675,6 +675,13 @@ CREATE INDEX idx_triagem_nratendimento ON demo.nutricional_triagem(nratendimento
 
 CREATE INDEX idx_avaliacao_nratendimento ON demo.nutricional_avaliacao(nratendimento);
 
+CREATE INDEX idx_glim_nratendimento ON demo.nutricional_glim(nratendimento);
+
+CREATE INDEX idx_d7_nratendimento ON demo.nutricional_d7(nratendimento);
+
+CREATE INDEX idx_alerta_nratendimento ON demo.nutricional_alerta(nratendimento);
+
+
 CREATE INDEX demo_checkedindex_idx ON demo.checkedindex ("nratendimento","fkmedicamento");
 
 CREATE UNIQUE INDEX demo_intervencao_unique ON demo."intervencao" ("idintervencao");
