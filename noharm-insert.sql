@@ -1153,3 +1153,200 @@ INSERT INTO demo.intervencao (fkpresmed, nratendimento, update_by, idmotivointer
 	(35, 4, 1, ARRAY[12], 'N', '<p>Medicamento de alta vigil&acirc;ncia - VARFARINA - com dose acima da usual.</p><p>Favor revisar.</p><p>Att, Farm...</p><p>Ramal...</p>'),
 	(34, 5, 1, ARRAY[12], 'N', '<p>A dose m&aacute;xima di&aacute;ria do PARACETAMOL &eacute; de 4g.</p><p>Favor rever frequ&ecirc;ncia (frequ&ecirc;ncia usual 6/6h)</p><p>Att, Farm...</p><p>Ramal...</p>'),
 	(23, 6, 1, ARRAY[15], 'N', '<p>A dose m&aacute;xima di&aacute;ria da HIOSCINA &eacute; de 100mg.</p><p>Frequ&ecirc;ncia usual &eacute; 6/6h.</p><p>Favor rever frequ&ecirc;ncia.</p><p>Att, Farm...</p><p>Ramal...</p>');
+
+INSERT INTO demo.nutricional_nrs (
+    nratendimento,
+
+    triagem_imc_baixo,
+    triagem_perda_peso,
+    triagem_ingestao_reduzida,
+    triagem_doenca_grave,
+
+    score_comprometimento,
+    score_gravidade,
+    idade_maior_70,
+
+    updated_at,
+    created_at
+) VALUES
+-- Atendimento 1: risco moderado
+(1, true,  true,  false, true,  2, 2, false, now(), now()),
+-- Atendimento 2: baixo risco
+(2, false, false, false, false, 0, 0, false, now(), now()),
+-- Atendimento 3: risco alto
+(3, true,  true,  true,  true,  3, 3, true,  now(), now()),
+-- Atendimento 4: ingestão reduzida
+(4, false, false, true,  false, 1, 1, false, now(), now()),
+-- Atendimento 5: idoso com risco leve
+(5, false, true,  false, false, 1, 0, true,  now(), now()),
+-- Atendimento 6: risco leve (ingestão reduzida)
+(6, false, false, true,  false, 1, 1, false, now(), now()),
+-- Atendimento 7: perda de peso + baixo IMC
+(7, true,  true,  false, false, 2, 1, false, now(), now()),
+-- Atendimento 8: paciente grave sem perda de peso ainda
+(8, false, false, true,  true,  2, 3, false, now(), now()),
+-- Atendimento 9: idoso com múltiplos fatores
+(9, true,  true,  true,  false, 3, 1, true,  now(), now()),
+-- Atendimento 10: saudável
+(10, false, false, false, false, 0, 0, false, now(), now()),
+-- Atendimento 11: doença grave isolada
+(11, false, false, false, true,  1, 3, false, now(), now()),
+-- Atendimento 12: risco moderado clássico
+(12, true,  false, true,  false, 2, 1, false, now(), now()),
+-- Atendimento 13: quadro grave completo
+(13, true,  true,  true,  true,  3, 3, true,  now(), now()),
+-- Atendimento 9999: caso de teste extremo (todos negativos)
+(9999, false, false, false, false, 0, 0, false, now(), now());
+
+INSERT INTO demo.nutricional_triagem ( -- pacientes em ala geral
+    nratendimento,
+    protocolo,
+    nrs_nut,
+    nrs_doenca,
+    nrs_idade,
+    nrs_total,
+    nrs_completo,
+    classificacao
+) VALUES
+(1,  'NRS2002', 2, 2, 0, 4, true, 'al'),
+(2,  'NRS2002', 0, 0, 0, 0, true, 'bx'),
+(3,  'NRS2002', 3, 3, 1, 7, true, 'al'),
+(4,  'NRS2002', 1, 1, 0, 2, true, 'bx'),
+(5,  'NRS2002', 1, 0, 1, 2, true, 'bx'),
+(6,  'NRS2002', 1, 1, 0, 2, true, 'bx'),
+(7,  'NRS2002', 2, 1, 0, 3, true, 'al'),
+(8,  'NRS2002', 2, 3, 0, 5, true, 'al'),
+(9,  'NRS2002', 3, 1, 1, 5, true, 'al'),
+(12, 'NRS2002', 2, 1, 0, 3, true, 'al'),
+(100,'NRS2002',2,1,1,4,true,'al'),
+(9999,'NRS2002',0, 0, 0, 0, true, 'bx');
+
+INSERT INTO demo.nutricional_triagem ( -- pacientes em uti
+    nratendimento,
+    protocolo,
+    mn_idade,
+    mn_apache,
+    mn_sofa,
+    mn_comor,
+    mn_dias,
+    mn_total,
+    classificacao
+) VALUES
+(1,  'MNUTRIC', 0, 2, 2, 1, 1, 6, 'al'),
+(2,  'MNUTRIC', 0, 1, 1, 0, 0, 2, 'bx'),
+(3,  'MNUTRIC', 1, 3, 3, 1, 1, 9, 'al'),
+(4,  'MNUTRIC', 0, 2, 1, 1, 1, 5, 'al'),
+(5,  'MNUTRIC', 0, 1, 2, 0, 0, 3, 'bx'),
+(6,  'MNUTRIC', 0, 2, 2, 1, 1, 6, 'al'),
+(7,  'MNUTRIC', 0, 3, 2, 1, 1, 7, 'al'),
+(8,  'MNUTRIC', 0, 2, 2, 0, 1, 5, 'al'),
+(9,  'MNUTRIC', 1, 2, 2, 1, 1, 7, 'al'),
+(10, 'MNUTRIC', 0, 1, 1, 0, 0, 2, 'bx'),
+(11, 'MNUTRIC', 0, 3, 2, 1, 1, 7, 'al'),
+(12, 'MNUTRIC', 0, 1, 1, 1, 0, 3, 'bx'),
+(13, 'MNUTRIC', 1, 3, 3, 1, 1, 9, 'al'),
+(9999, 'MNUTRIC', 0, 2, 1, 0, 1, 4, 'bx');
+
+INSERT INTO demo.nutricional_glim (
+    nratendimento,
+    diagnostico,
+    fenotipos,
+    etiologias,
+    observacao,
+    idusuario
+) VALUES
+-- 1: risco → fecha GLIM moderado
+(1, 'mod',
+ ARRAY['perda_peso'],
+ ARRAY['inflamacao'],
+ 'Perda de peso associada a processo inflamatório',
+ 1),
+-- 3: caso grave clássico
+(3, 'grave',
+ ARRAY['perda_peso','baixo_imc'],
+ ARRAY['inflamacao'],
+ 'Critérios múltiplos com inflamação sistêmica',
+ 1),
+-- 7: risco leve → não fecha GLIM
+(7, 'nd',
+ ARRAY['baixo_imc'],
+ ARRAY[]::TEXT[],
+ 'Sem critério etiológico associado',
+ 1),
+-- 8: doença grave → fecha moderado
+(8, 'mod',
+ ARRAY['massa_muscular_baixa'],
+ ARRAY['inflamacao'],
+ 'Redução de massa muscular em contexto inflamatório',
+ 1),
+-- 9: idoso com múltiplos fatores → grave
+(9, 'grave',
+ ARRAY['perda_peso','massa_muscular_baixa'],
+ ARRAY['inflamacao'],
+ 'Idoso com perda significativa e inflamação',
+ 1),
+-- 11: UTI com doença grave → moderado
+(11, 'mod',
+ ARRAY['massa_muscular_baixa'],
+ ARRAY['doenca_cronica'],
+ 'Paciente crítico com comorbidades',
+ 1),
+-- 12: risco moderado → não fecha GLIM
+(12, 'nd',
+ ARRAY['baixo_imc'],
+ ARRAY[]::TEXT[],
+ 'Critérios insuficientes para diagnóstico',
+ 1),
+-- 13: caso crítico → grave
+(13, 'grave',
+ ARRAY['perda_peso','massa_muscular_baixa'],
+ ARRAY['inflamacao','doenca_cronica'],
+ 'Desnutrição grave com múltiplos fatores etiológicos',
+ 1),
+ (9999, 'mod',   ARRAY['perda_peso'], ARRAY['inflamacao'], 'Moderado', 1);
+
+INSERT INTO demo.nutricional_avaliacao (
+    nratendimento,
+    idusuario,
+    conduta,
+    frequencia,
+    ingestao,
+    meta_kcal,
+    meta_prot
+) VALUES
+(1, 1, 'Iniciar dieta enteral', '24h', 60, 2000, 90),
+(2, 1, 'Manter dieta oral', 'rotina', 85, 1800, 70),
+(3, 1, 'Suporte nutricional intensivo', '12h', 40, 2200, 110),
+(4, 1, 'Ajustar dieta oral', '24h', 70, 1900, 80),
+(5, 1, 'Suplementação oral', '12h', 65, 2000, 85),
+(6, 1, 'Manter dieta oral', 'rotina', 85, 1800, 70),
+(7, 1, 'Iniciar suporte nutricional', '24h', 55, 2100, 95),
+(8, 1, 'Nutrição enteral', '12h', 40, 2200, 110),
+(9, 1, 'Aumentar ingestão calórica', '24h', 60, 2000, 90),
+(10,1, 'Manter dieta oral', 'rotina', 90, 1800, 70),
+(11,1, 'Suporte intensivo', '12h', 35, 2300, 115),
+(12,1, 'Ajustar dieta oral', '24h', 70, 1900, 80),
+(13,1, 'Nutrição enteral', '12h', 30, 2400, 120),
+(9999,1, 'Suplementação oral', '24h', 65, 2000, 85);
+
+INSERT INTO demo.nutricional_alerta (
+    nratendimento,
+    tipo,
+    descricao,
+    severidade,
+    ativo
+) VALUES
+(1, 'clin', 'Baixa ingestão alimentar', 'amarelo', true),
+(2, 'lab',  'Albumina reduzida', 'laranja', true),
+(3, 'clin', 'Perda de peso acentuada', 'vermelho', true),
+(4, 'clin', 'Ingestão alimentar reduzida', 'amarelo', true),
+(5, 'lab',  'Deficiência de ferro', 'laranja', true),
+(6, 'clin', 'Perda de apetite', 'amarelo', true),
+(7, 'clin', 'Baixo IMC', 'laranja', true),
+(8, 'lab',  'Proteínas baixas', 'vermelho', true),
+(9, 'clin', 'Perda de peso recente', 'laranja', true),
+(10,'clin', 'Sem risco nutricional', 'amarelo', false),
+(11,'lab',  'Albumina crítica', 'vermelho', true),
+(12,'clin', 'Ingestão insuficiente', 'amarelo', true),
+(13,'clin', 'Desnutrição grave', 'vermelho', true),
+(9999,'lab',  'Baixa vitamina D', 'amarelo', true);

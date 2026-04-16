@@ -10,3 +10,6 @@ NoHarm Database Statements
 - Insert Records
 - Copy Script
 - Create User
+
+## Diagrama das tabelas nutricionais
+![img.png](img.png)

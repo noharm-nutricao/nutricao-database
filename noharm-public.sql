@@ -220,6 +220,17 @@ CREATE TABLE public."base_conhecimento" (
 	"created_by" integer not null
 );
 
+CREATE TABLE public."nutricional_cid_gravidade" (
+  prefixo   CHAR(1) PRIMARY KEY,
+  score_nrs SMALLINT NOT NULL CHECK (score_nrs BETWEEN 0 AND 2),
+  justif    TEXT
+);
+
+CREATE TABLE public."nutricional_cid_override" (
+  prefixo3  CHAR(3) PRIMARY KEY,
+  score_nrs SMALLINT NOT NULL CHECK (score_nrs BETWEEN 0 AND 2)
+);
+
 CREATE INDEX ON public."usuario_autorizacao" ("idusuario");
 
 CREATE UNIQUE INDEX ON public."substancia" ("sctid");
@@ -1235,3 +1246,20 @@ BEGIN
   RETURN V_RESULTADO;
 END;
 $function$;
+
+INSERT INTO public.nutricional_cid_gravidade VALUES
+  ('C', 2, 'Neoplasias malignas'),
+  ('D', 2, 'Neoplasias benignas com impacto nutricional'),
+  ('J', 1, 'Respiratorio - ver override para J18, J44, J96'),
+  ('K', 1, 'Digestivo - ver override para K85, K57'),
+  ('I', 1, 'Circulatorio - ver override para I63, I21, I50'),
+  ('N', 1, 'Renal'),
+  ('E', 1, 'Endocrino e metabolico'),
+  ('M', 1, 'Musculoesqueletico'),
+  ('F', 0, 'Transtornos mentais'),
+  ('Z', 0, 'Fatores que influenciam a saude');
+
+INSERT INTO public.nutricional_cid_override VALUES
+  ('J18', 2), ('J96', 2), ('J44', 1),
+  ('K85', 2), ('K92', 2), ('K57', 1),
+  ('I63', 2), ('I21', 2), ('I50', 1), ('I70', 1);

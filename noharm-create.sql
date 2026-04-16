@@ -563,6 +563,96 @@ create table demo."relatorio" (
 	"created_by" integer not null
 );
 
+CREATE TABLE demo.nutricional_nrs (
+id bigserial PRIMARY KEY,
+
+nratendimento       BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
+
+triagem_imc_baixo boolean NOT NULL,
+triagem_perda_peso boolean NOT NULL,
+triagem_ingestao_reduzida boolean NOT NULL,
+triagem_doenca_grave boolean NOT NULL,
+
+score_comprometimento smallint,
+score_gravidade smallint,
+idade_maior_70 boolean,
+
+updated_at          TIMESTAMPTZ NOT NULL,
+created_at          TIMESTAMPTZ NOT NULL
+
+);
+
+CREATE TABLE demo.nutricional_triagem (
+  id               SERIAL PRIMARY KEY,
+  nratendimento    BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
+  protocolo        VARCHAR(10) NOT NULL CHECK (protocolo IN ('MNUTRIC','NRS2002')),
+  -- NRS-2002
+  nrs_nut          SMALLINT CHECK (nrs_nut BETWEEN 0 AND 3),
+  nrs_doenca       SMALLINT CHECK (nrs_doenca BETWEEN 0 AND 3),
+  nrs_idade        SMALLINT CHECK (nrs_idade BETWEEN 0 AND 1),
+  nrs_total        SMALLINT CHECK (nrs_total BETWEEN 0 AND 7),
+  nrs_completo     BOOLEAN NOT NULL DEFAULT false,
+  nrs_ref_at       TIMESTAMPTZ,
+  -- mNUTRIC
+  mn_idade         SMALLINT CHECK (mn_idade BETWEEN 0 AND 2),
+  mn_apache        SMALLINT CHECK (mn_apache BETWEEN 0 AND 3),
+  mn_sofa          SMALLINT CHECK (mn_sofa BETWEEN 0 AND 3),
+  mn_comor         SMALLINT CHECK (mn_comor BETWEEN 0 AND 1),
+  mn_dias          SMALLINT CHECK (mn_dias BETWEEN 0 AND 1),
+  mn_total         SMALLINT CHECK (mn_total BETWEEN 0 AND 10),
+  mn_apache_manual BOOLEAN DEFAULT false,
+  mn_sofa_manual   BOOLEAN DEFAULT false,
+  -- Classificacao
+  classificacao    VARCHAR(2) CHECK (classificacao IN ('cr','al','md','bx')),
+  calculado_at     TIMESTAMPTZ DEFAULT now(),
+  created_at       TIMESTAMPTZ DEFAULT now(),
+  updated_at       TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE demo.nutricional_glim (
+  id            SERIAL PRIMARY KEY,
+  nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
+  diagnostico   VARCHAR(10) CHECK (diagnostico IN ('nd','mod','grave')),
+  fenotipos     TEXT[],
+  etiologias    TEXT[],
+  observacao    TEXT,
+  idusuario     INTEGER REFERENCES public.usuario(idusuario),
+  created_at    TIMESTAMPTZ DEFAULT now(),
+  updated_at    TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE demo.nutricional_avaliacao (
+  id            SERIAL PRIMARY KEY,
+  nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
+  idusuario     INTEGER REFERENCES public.usuario(idusuario),
+  conduta       TEXT,
+  frequencia    VARCHAR(10) CHECK (frequencia IN ('12h','24h','48h','7d','rotina')),
+  ingestao      SMALLINT CHECK (ingestao BETWEEN 0 AND 100),
+  meta_kcal     SMALLINT,
+  meta_prot     SMALLINT,
+  created_at    TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE demo.nutricional_d7 (
+  id            SERIAL PRIMARY KEY,
+  nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
+  dt_prevista   TIMESTAMPTZ NOT NULL,
+  concluido     BOOLEAN DEFAULT false,
+  idusuario     INTEGER REFERENCES public.usuario(idusuario),
+  created_at    TIMESTAMPTZ DEFAULT now()
+);
+
+-- Sem valor numerico do exame (LGPD)
+CREATE TABLE demo.nutricional_alerta (
+  id            SERIAL PRIMARY KEY,
+  nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
+  tipo          VARCHAR(5) CHECK (tipo IN ('lab','clin','rx')),
+  descricao     TEXT,
+  severidade    VARCHAR(10) CHECK (severidade IN ('amarelo','laranja','vermelho')),
+  ativo         BOOLEAN DEFAULT true,
+  created_at    TIMESTAMPTZ DEFAULT now()
+);
+
 CREATE SEQUENCE demo.prescricao_fkprescricao_seq
 	MINVALUE 0
 	NO MAXVALUE
@@ -575,6 +665,22 @@ CREATE SEQUENCE demo.evolucao_fkevolucao_seq
 	NO MAXVALUE
 	START 1
 	NO CYCLE;
+
+-- NUTRICIONAL INDEXES
+CREATE INDEX idx_nrs_nratendimento ON demo.nutricional_nrs(nratendimento);
+CREATE INDEX idx_nrs_updated_at    ON demo.nutricional_nrs(updated_at);
+CREATE INDEX demo_nutricional_nrs_atendimento_idx ON demo.nutricional_nrs (nratendimento, updated_at DESC);
+
+CREATE INDEX idx_triagem_nratendimento ON demo.nutricional_triagem(nratendimento);
+
+CREATE INDEX idx_avaliacao_nratendimento ON demo.nutricional_avaliacao(nratendimento);
+
+CREATE INDEX idx_glim_nratendimento ON demo.nutricional_glim(nratendimento);
+
+CREATE INDEX idx_d7_nratendimento ON demo.nutricional_d7(nratendimento);
+
+CREATE INDEX idx_alerta_nratendimento ON demo.nutricional_alerta(nratendimento);
+
 
 CREATE INDEX demo_checkedindex_idx ON demo.checkedindex ("nratendimento","fkmedicamento");
 
