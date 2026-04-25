@@ -554,7 +554,7 @@ create table demo."relatorio" (
 	"ativo" boolean not null,
 	"tp_status" int4 not null,
 	"erro" text null,
-  "graficos" json null,
+    "graficos" json null,
 	"processed_at" timestamp null,
 	"processed_by" integer null,
 	"updated_at" timestamp null,
@@ -639,18 +639,22 @@ CREATE TABLE demo.nutricional_d7 (
   dt_prevista   TIMESTAMPTZ NOT NULL,
   concluido     BOOLEAN DEFAULT false,
   idusuario     INTEGER REFERENCES public.usuario(idusuario),
-  created_at    TIMESTAMPTZ DEFAULT now()
+  created_at    TIMESTAMPTZ DEFAULT now(),
+  updated_at    TIMESTAMPTZ
 );
 
 -- Sem valor numerico do exame (LGPD)
 CREATE TABLE demo.nutricional_alerta (
-  id            SERIAL PRIMARY KEY,
-  nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
-  tipo          VARCHAR(5) CHECK (tipo IN ('lab','clin','rx')),
-  descricao     TEXT,
-  severidade    VARCHAR(10) CHECK (severidade IN ('amarelo','laranja','vermelho')),
-  ativo         BOOLEAN DEFAULT true,
-  created_at    TIMESTAMPTZ DEFAULT now()
+  id              SERIAL PRIMARY KEY,
+  nratendimento   BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
+  tipo            VARCHAR(5) CHECK (tipo IN ('lab','clin','rx')),
+  descricao       TEXT,
+  severidade      VARCHAR(10) CHECK (severidade IN ('amarelo','laranja','vermelho')),
+  ativo           BOOLEAN DEFAULT true,
+  created_at      TIMESTAMPTZ DEFAULT now(),
+  reconhecido     BOOLEAN DEFAULT false,
+  reconhecido_por INTEGER NOT NULL REFERENCES public.usuario(idusuario),
+  reconhecido_at  timestamptz DEFAULT now()
 );
 
 CREATE SEQUENCE demo.prescricao_fkprescricao_seq
