@@ -1,4 +1,4 @@
-CREATE SCHEMA demo;
+CREATE SCHEMA IF NOT EXISTS demo;
 GRANT ALL ON SCHEMA demo TO postgres;
 
 

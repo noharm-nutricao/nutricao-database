@@ -33,17 +33,24 @@ CREATE TABLE teste."segmento" (
 -- TRUNCATE All Tables
 --
 
-TRUNCATE TABLE public.usuario RESTART IDENTITY;
-TRUNCATE TABLE demo.hospital RESTART IDENTITY;
-TRUNCATE TABLE demo.setor RESTART IDENTITY;
-TRUNCATE TABLE demo.segmento RESTART IDENTITY;
-TRUNCATE TABLE demo.unidademedida RESTART IDENTITY;
-TRUNCATE TABLE demo.frequencia RESTART IDENTITY;
-TRUNCATE TABLE demo.medicamento RESTART IDENTITY;
-TRUNCATE TABLE demo.pessoa RESTART IDENTITY;
-TRUNCATE TABLE demo.exame RESTART IDENTITY;
-TRUNCATE TABLE demo.prescricao, demo.outlier, demo.prescricaoagg RESTART IDENTITY;
-TRUNCATE TABLE demo.motivointervencao, demo.intervencao, demo.presmed, demo.memoria RESTART IDENTITY;
+TRUNCATE TABLE
+public.usuario,
+demo.hospital,
+demo.setor,
+demo.segmento,
+demo.unidademedida,
+demo.frequencia,
+demo.medicamento,
+demo.pessoa,
+demo.exame,
+demo.prescricao,
+demo.outlier,
+demo.prescricaoagg,
+demo.motivointervencao,
+demo.intervencao,
+demo.presmed,
+demo.memoria
+RESTART IDENTITY CASCADE;
 
 --
 -- Insert Support's Tables
@@ -1213,13 +1220,7 @@ INSERT INTO demo.nutricional_triagem ( -- pacientes em ala geral
 (3,  'NRS2002', 3, 3, 1, 7, true, 'al'),
 (4,  'NRS2002', 1, 1, 0, 2, true, 'bx'),
 (5,  'NRS2002', 1, 0, 1, 2, true, 'bx'),
-(6,  'NRS2002', 1, 1, 0, 2, true, 'bx'),
-(7,  'NRS2002', 2, 1, 0, 3, true, 'al'),
-(8,  'NRS2002', 2, 3, 0, 5, true, 'al'),
-(9,  'NRS2002', 3, 1, 1, 5, true, 'al'),
-(12, 'NRS2002', 2, 1, 0, 3, true, 'al'),
-(100,'NRS2002',2,1,1,4,true,'al'),
-(9999,'NRS2002',0, 0, 0, 0, true, 'bx');
+(6,  'NRS2002', 1, 1, 0, 2, true, 'bx');
 
 INSERT INTO demo.nutricional_triagem ( -- pacientes em uti
     nratendimento,
@@ -1230,22 +1231,17 @@ INSERT INTO demo.nutricional_triagem ( -- pacientes em uti
     mn_comor,
     mn_dias,
     mn_total,
+    mn_apache_manual,
+    mn_sofa_manual,
     classificacao
 ) VALUES
-(1,  'MNUTRIC', 0, 2, 2, 1, 1, 6, 'al'),
-(2,  'MNUTRIC', 0, 1, 1, 0, 0, 2, 'bx'),
-(3,  'MNUTRIC', 1, 3, 3, 1, 1, 9, 'al'),
-(4,  'MNUTRIC', 0, 2, 1, 1, 1, 5, 'al'),
-(5,  'MNUTRIC', 0, 1, 2, 0, 0, 3, 'bx'),
-(6,  'MNUTRIC', 0, 2, 2, 1, 1, 6, 'al'),
-(7,  'MNUTRIC', 0, 3, 2, 1, 1, 7, 'al'),
-(8,  'MNUTRIC', 0, 2, 2, 0, 1, 5, 'al'),
-(9,  'MNUTRIC', 1, 2, 2, 1, 1, 7, 'al'),
-(10, 'MNUTRIC', 0, 1, 1, 0, 0, 2, 'bx'),
-(11, 'MNUTRIC', 0, 3, 2, 1, 1, 7, 'al'),
-(12, 'MNUTRIC', 0, 1, 1, 1, 0, 3, 'bx'),
-(13, 'MNUTRIC', 1, 3, 3, 1, 1, 9, 'al'),
-(9999, 'MNUTRIC', 0, 2, 1, 0, 1, 4, 'bx');
+(7,  'MNUTRIC', 0, 3, 2, 1, 1, 7, true, true, 'al'),
+(8,  'MNUTRIC', 0, 2, 2, 0, 1, 5, true, true, 'al'),
+(10, 'MNUTRIC', 0, 1, 1, 0, 0, 2, true, true, 'bx'),
+(11, 'MNUTRIC', 0, 3, 2, 1, 1, 7, true, true, 'al'),
+(12, 'MNUTRIC', 0, 0, 0, 1, 0, 3, false, false, 'bx'),
+(13, 'MNUTRIC', 1, 0, 0, 1, 1, 9, false, false, 'al'),
+(9999, 'MNUTRIC', 0, 0, 0, 0, 1, 4, false, false, 'bx');
 
 INSERT INTO demo.nutricional_glim (
     nratendimento,
@@ -1334,19 +1330,21 @@ INSERT INTO demo.nutricional_alerta (
     tipo,
     descricao,
     severidade,
-    ativo
+    ativo,
+    reconhecido,
+    reconhecido_por
 ) VALUES
-(1, 'clin', 'Baixa ingestão alimentar', 'amarelo', true),
-(2, 'lab',  'Albumina reduzida', 'laranja', true),
-(3, 'clin', 'Perda de peso acentuada', 'vermelho', true),
-(4, 'clin', 'Ingestão alimentar reduzida', 'amarelo', true),
-(5, 'lab',  'Deficiência de ferro', 'laranja', true),
-(6, 'clin', 'Perda de apetite', 'amarelo', true),
-(7, 'clin', 'Baixo IMC', 'laranja', true),
-(8, 'lab',  'Proteínas baixas', 'vermelho', true),
-(9, 'clin', 'Perda de peso recente', 'laranja', true),
-(10,'clin', 'Sem risco nutricional', 'amarelo', false),
-(11,'lab',  'Albumina crítica', 'vermelho', true),
-(12,'clin', 'Ingestão insuficiente', 'amarelo', true),
-(13,'clin', 'Desnutrição grave', 'vermelho', true),
-(9999,'lab',  'Baixa vitamina D', 'amarelo', true);
+(1, 'clin', 'Baixa ingestão alimentar', 'amarelo', true, false, 1),
+(2, 'lab',  'Albumina reduzida', 'laranja', true, false, 1),
+(3, 'clin', 'Perda de peso acentuada', 'vermelho', true, false, 1),
+(4, 'clin', 'Ingestão alimentar reduzida', 'amarelo', true, false, 1),
+(5, 'lab',  'Deficiência de ferro', 'laranja', true, false, 1),
+(6, 'clin', 'Perda de apetite', 'amarelo', true, false, 1),
+(7, 'clin', 'Baixo IMC', 'laranja', true, false, 1),
+(8, 'lab',  'Proteínas baixas', 'vermelho', true, false, 1),
+(9, 'clin', 'Perda de peso recente', 'laranja', true, false, 1),
+(10,'clin', 'Sem risco nutricional', 'amarelo', false, false, 1),
+(11,'lab',  'Albumina crítica', 'vermelho', true, false, 1),
+(12,'clin', 'Ingestão insuficiente', 'amarelo', true, false, 1),
+(13,'clin', 'Desnutrição grave', 'vermelho', true, false, 1),
+(9999,'lab', 'Baixa vitamina D', 'amarelo', true, false, 1);
