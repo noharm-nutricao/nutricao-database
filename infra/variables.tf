@@ -12,10 +12,6 @@ variable "lambda_security_group_id" {
   type = string
 }
 
-variable "image_uri" {
-  type = string
-}
-
 variable "tf_state_bucket" {
   type = string
 }

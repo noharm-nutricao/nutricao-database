@@ -153,7 +153,6 @@ resource "aws_lambda_function" "app" {
   role          = aws_iam_role.lambda_role.arn
 
   package_type = "Image"
-  image_uri    = var.image_uri
 
   timeout     = 30
   memory_size = 512
