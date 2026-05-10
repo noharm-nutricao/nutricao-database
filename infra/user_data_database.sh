@@ -7,6 +7,9 @@ dnf install -y docker unzip awscli docker-compose-plugin
 systemctl enable docker
 systemctl start docker
 
+systemctl enable amazon-ssm-agent
+systemctl start amazon-ssm-agent
+
 mkdir -p /opt/nitra/database
 mkdir -p /opt/nitra/postgres-data
 
