@@ -68,6 +68,31 @@ jobs:
           INSTANCE_ID=$(terraform output -raw database_instance_id)
           echo "instance_id=$INSTANCE_ID" >> $GITHUB_OUTPUT
 
+      - name: Aguardar EC2 ficar online no SSM
+        run: |
+          INSTANCE_ID="${{ steps.tfout.outputs.instance_id }}"
+
+          echo "Aguardando instância $INSTANCE_ID ficar online no SSM..."
+
+          for i in {1..30}; do
+            STATUS=$(aws ssm describe-instance-information \
+              --filters "Key=InstanceIds,Values=$INSTANCE_ID" \
+              --query "InstanceInformationList[0].PingStatus" \
+              --output text)
+
+            echo "Tentativa $i - Status: $STATUS"
+
+            if [ "$STATUS" = "Online" ]; then
+              echo "Instância online no SSM."
+              exit 0
+            fi
+
+            sleep 20
+          done
+
+          echo "Instância não ficou online no SSM a tempo."
+          exit 1
+
       - name: Rodar Flyway na EC2 via SSM
         run: |
           COMMAND_ID=$(aws ssm send-command \
