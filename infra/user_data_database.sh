@@ -2,7 +2,7 @@
 set -e
 
 dnf update -y
-dnf install -y docker unzip awscli docker-compose-plugin
+dnf install -y docker unzip awscli amazon-ssm-agent docker-compose-plugin
 
 systemctl enable docker
 systemctl start docker

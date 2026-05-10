@@ -44,6 +44,8 @@ resource "aws_instance" "database" {
   iam_instance_profile        = aws_iam_instance_profile.database_profile.name
   associate_public_ip_address = true
 
+  user_data_replace_on_change = true
+
   root_block_device {
     volume_size = var.database_volume_size
     volume_type = "gp3"
