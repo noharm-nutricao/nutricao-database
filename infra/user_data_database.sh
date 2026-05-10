@@ -2,13 +2,13 @@
 set -e
 
 dnf update -y
-dnf install -y docker unzip awscli amazon-ssm-agent docker-compose-plugin
+dnf install -y docker unzip awscli amazon-ssm-agent docker-compose-plugin || true
 
 systemctl enable docker
 systemctl start docker
 
-systemctl enable amazon-ssm-agent
-systemctl start amazon-ssm-agent
+systemctl enable amazon-ssm-agent || true
+systemctl start amazon-ssm-agent || true
 
 mkdir -p /opt/nitra/database
 mkdir -p /opt/nitra/postgres-data
