@@ -104,19 +104,32 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.ec2.outputs.public_ip }} << 'EOF'
             set -e
 
-            sudo dnf install -y unzip docker docker-compose-plugin
+            sudo dnf install -y unzip docker
 
             sudo systemctl enable docker
             sudo systemctl start docker
 
             sudo rm -rf /opt/nitra/database
             sudo mkdir -p /opt/nitra/database
+            sudo mkdir -p /opt/nitra/postgres-data
 
             sudo unzip -q /tmp/database.zip -d /opt/nitra/database
 
-            cd /opt/nitra
+            cd /opt/nitra/database
 
-            sudo docker compose up -d postgres
+            sudo docker network create nitra-network || true
+
+            sudo docker rm -f nitra-postgres || true
+
+            sudo docker run -d \
+              --name nitra-postgres \
+              --network nitra-network \
+              -p 5432:5432 \
+              -e POSTGRES_DB='${{ secrets.DB_NAME }}' \
+              -e POSTGRES_USER='${{ secrets.DB_USER }}' \
+              -e POSTGRES_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+              -v /opt/nitra/postgres-data:/var/lib/postgresql/data \
+              postgres:16
 
             for i in {1..30}; do
               sudo docker exec nitra-postgres pg_isready \
@@ -124,5 +137,13 @@ jobs:
                 -d '${{ secrets.DB_NAME }}' && break || sleep 5
             done
 
-            sudo docker compose run --rm flyway
+            sudo docker build -t nitra-flyway .
+
+            sudo docker run --rm \
+              --network nitra-network \
+              nitra-flyway \
+              -url=jdbc:postgresql://nitra-postgres:5432/${{ secrets.DB_NAME }} \
+              -user=${{ secrets.DB_USER }} \
+              -password=${{ secrets.DB_PASSWORD }} \
+              migrate
           EOF
