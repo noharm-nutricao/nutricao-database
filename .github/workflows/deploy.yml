@@ -104,6 +104,11 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.ec2.outputs.public_ip }} << 'EOF'
             set -e
 
+            sudo dnf install -y unzip docker docker-compose-plugin
+
+            sudo systemctl enable docker
+            sudo systemctl start docker
+
             sudo rm -rf /opt/nitra/database
             sudo mkdir -p /opt/nitra/database
 
