@@ -36,32 +36,6 @@ data "aws_ami" "amazon_linux_2023" {
   }
 }
 
-resource "aws_instance" "database" {
-  ami                         = data.aws_ami.amazon_linux_2023.id
-  instance_type               = var.database_instance_type
-  subnet_id                   = data.aws_subnets.default.ids[0]
-  vpc_security_group_ids      = [aws_security_group.database_sg.id]
-  iam_instance_profile        = aws_iam_instance_profile.database_profile.name
-  associate_public_ip_address = true
-
-  user_data_replace_on_change = true
-
-  root_block_device {
-    volume_size = var.database_volume_size
-    volume_type = "gp3"
-  }
-
-  user_data = templatefile("${path.module}/user_data_database.sh", {
-    db_name     = var.db_name
-    db_user     = var.db_user
-    db_password = var.db_password
-  })
-
-  tags = {
-    Name = "${var.project_name}-database"
-  }
-}
-
 resource "aws_iam_role" "database_role" {
   name = "${var.project_name}-database-role"
 
@@ -101,4 +75,36 @@ resource "aws_iam_role_policy" "database_s3_deploy" {
 resource "aws_iam_instance_profile" "database_profile" {
   name = "${var.project_name}-database-profile"
   role = aws_iam_role.database_role.name
+}
+
+resource "aws_instance" "database" {
+  ami                         = data.aws_ami.amazon_linux_2023.id
+  instance_type               = var.database_instance_type
+  subnet_id                   = data.aws_subnets.default.ids[0]
+  vpc_security_group_ids      = [aws_security_group.database_sg.id]
+  iam_instance_profile        = aws_iam_instance_profile.database_profile.name
+  associate_public_ip_address = true
+
+  user_data_replace_on_change = true
+
+  depends_on = [
+    aws_iam_role_policy_attachment.database_ssm,
+    aws_iam_role_policy.database_s3_deploy,
+    aws_iam_instance_profile.database_profile
+  ]
+
+  root_block_device {
+    volume_size = var.database_volume_size
+    volume_type = "gp3"
+  }
+
+  user_data = templatefile("${path.module}/user_data_database.sh", {
+    db_name     = var.db_name
+    db_user     = var.db_user
+    db_password = var.db_password
+  })
+
+  tags = {
+    Name = "${var.project_name}-database"
+  }
 }
