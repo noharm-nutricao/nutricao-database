@@ -95,7 +95,7 @@ jobs:
           echo "Instância não ficou online no SSM a tempo."
           exit 1
 
-      - name: Rodar banco e Flyway na EC2 via SSM
+      - name: Rodar Flyway na EC2 via SSM
         run: |
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "${{ steps.tfout.outputs.instance_id }}" \
@@ -103,47 +103,14 @@ jobs:
             --comment "Deploy database migrations" \
             --parameters 'commands=[
               "set -e",
-
               "aws s3 cp s3://${{ secrets.TF_STATE_BUCKET }}/deployments/database-${{ github.sha }}.zip /tmp/database.zip",
-
               "rm -rf /opt/nitra/database",
-
               "mkdir -p /opt/nitra/database",
-
               "unzip -q /tmp/database.zip -d /opt/nitra/database",
-
-              "cd /opt/nitra/database",
-
-              "docker network create nitra-network || true",
-
-              "docker rm -f nitra-postgres || true",
-
-              "docker run -d \
-                --name nitra-postgres \
-                --network nitra-network \
-                -p 5432:5432 \
-                -e POSTGRES_DB=${{ secrets.DB_NAME }} \
-                -e POSTGRES_USER=${{ secrets.DB_USER }} \
-                -e POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} \
-                postgres:16",
-
-              "for i in {1..30}; do \
-                docker exec nitra-postgres \
-                pg_isready \
-                -U ${{ secrets.DB_USER }} \
-                -d ${{ secrets.DB_NAME }} \
-                && break || sleep 5; \
-              done",
-
-              "docker build -t nitra-flyway .",
-
-              "docker run --rm \
-                --network nitra-network \
-                -e DB_HOST=nitra-postgres \
-                -e DB_NAME=${{ secrets.DB_NAME }} \
-                -e DB_USER=${{ secrets.DB_USER }} \
-                -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-                nitra-flyway"
+              "cd /opt/nitra",
+              "docker compose up -d postgres",
+              "for i in {1..30}; do docker exec nitra-postgres pg_isready -U '${{ secrets.DB_USER }}' -d '${{ secrets.DB_NAME }}' && break || sleep 5; done",
+              "docker compose run --rm flyway"
             ]' \
             --query "Command.CommandId" \
             --output text)
