@@ -85,6 +85,8 @@ resource "aws_instance" "database" {
   iam_instance_profile        = aws_iam_instance_profile.database_profile.name
   associate_public_ip_address = true
 
+  key_name = "nitra-key"
+
   user_data_replace_on_change = true
 
   depends_on = [
