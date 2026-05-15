@@ -42,7 +42,7 @@ BEGIN
 END;$BODY$;
 
 ALTER FUNCTION demo.complete_presmed()
-    OWNER TO postgres;
+    OWNER TO CURRENT_USER;
 
 DROP TRIGGER IF EXISTS trg_complete_presmed ON demo.presmed;
 
@@ -87,7 +87,7 @@ BEGIN
 END;$BODY$;
 
 ALTER FUNCTION demo.complete_prescricao()
-    OWNER TO postgres;
+    OWNER TO CURRENT_USER;
 
 DROP TRIGGER IF EXISTS trg_complete_prescricao ON demo.prescricao;
 
@@ -129,7 +129,7 @@ END;$function$
 
 
 ALTER FUNCTION demo.complete_prescricaoagg()
-    OWNER TO postgres;
+    OWNER TO CURRENT_USER;
 
 DROP TRIGGER IF EXISTS trg_complete_prescricaoagg ON demo.prescricaoagg;
 
@@ -168,7 +168,7 @@ BEGIN
 END;$function$
 ;
 
-ALTER FUNCTION demo.atualiza_prescricao() OWNER TO postgres;
+ALTER FUNCTION demo.atualiza_prescricao() OWNER TO CURRENT_USER;
 
 DROP TRIGGER IF EXISTS trg_atualiza_prescricao ON demo.prescricao;
 
