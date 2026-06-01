@@ -1,3 +1,6 @@
+-- limpar tabela de alertas que estão incorretos
+DELETE FROM demo.nutricional_alerta;
+
 CREATE TABLE demo.nutricional_aux_alerta(
     id SERIAL PRIMARY KEY,
     nratendimento BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
@@ -6,7 +9,6 @@ CREATE TABLE demo.nutricional_aux_alerta(
     reconhecido BOOLEAN DEFAULT false
 );
 
-SELECT * FROM demo.nutricional_aux_alerta;
 ----------TRIGGER CRIA ALERTA EVOLUCAO----------
 DROP FUNCTION IF EXISTS demo.cria_aux_alerta_evolucao();
 
@@ -92,20 +94,15 @@ FOR EACH ROW
 EXECUTE FUNCTION demo.cria_aux_alerta_presmed();
 -------------FIM DA TRIGGER-------------
 
+-- remver NOT NULL da coluna reconhecido_por para iniciar alerta com
+-- essa coluna nula (ficar assim até alguém reconhecer)
+ALTER TABLE demo.nutricional_alerta
+ALTER COLUMN reconhecido_por DROP NOT NULL;
 
--- SELECTS QUE SERAO UTILIZADOS NO REPOSITORY
--- ISSO É APENAS PARA SALVAR PARA DEPOIS
-SELECT naa.nratendimento,
-       ev.anotacoes
-  FROM demo.nutricional_aux_alerta naa
-  JOIN demo.evolucao ev
-    ON ev.fkevolucao = naa.fkevolucao
- WHERE naa.reconhecido = false
-   AND naa.fkevolucao IS NOT NULL;
+ALTER TABLE demo.nutricional_alerta
+DROP CONSTRAINT nutricional_alerta_severidade_check;
 
-SELECT naa.nratendimento
-  FROM demo.nutricional_aux_alerta naa
-  JOIN demo.presmed ev
-    ON ev.fkpresmed = naa.fkpresmed
- WHERE naa.reconhecido = false
-   AND naa.fkpresmed IS NOT NULL;
+-- alterado constraint de check para severidade
+ALTER TABLE demo.nutricional_alerta
+ADD CONSTRAINT nutricional_alerta_severidade_check_updated
+CHECK (severidade IN ('md', 'al', 'cr'));
