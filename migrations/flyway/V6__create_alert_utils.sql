@@ -55,16 +55,19 @@ DECLARE
     v_nratendimento BIGINT;
 BEGIN
 
-    SELECT p.nratendimento
-      INTO v_nratendimento
-      FROM demo.prescricao p
-     WHERE p.fkprescricao = NEW.fkprescricao;
+    IF lower(trim(NEW.origem)) IN ('dieta', 'dietas') THEN
 
-    IF v_nratendimento IS NULL THEN
-        RAISE EXCEPTION
-            'Prescrição % não encontrada para o medicamento %',
-            NEW.fkprescricao,
-            NEW.fkpresmed;
+        SELECT p.nratendimento
+        INTO v_nratendimento
+        FROM demo.prescricao p
+        WHERE p.fkprescricao = NEW.fkprescricao;
+
+        IF v_nratendimento IS NULL THEN
+            RAISE EXCEPTION
+                'Prescrição % não encontrada',
+                NEW.fkprescricao;
+        END IF;
+
     END IF;
 
     INSERT INTO demo.nutricional_aux_alerta (
