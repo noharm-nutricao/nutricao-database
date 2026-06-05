@@ -1,5 +1,7 @@
--- limpar tabela de alertas que estão incorretos
-DELETE FROM demo.nutricional_alerta;
+-- rastreabilidade: qual evolução/presmed originou cada alerta
+ALTER TABLE demo.nutricional_alerta
+ADD COLUMN IF NOT EXISTS fk_origem_gatilho_evol BIGINT,
+ADD COLUMN IF NOT EXISTS fk_origem_gatilho_pres BIGINT;
 
 CREATE TABLE demo.nutricional_aux_alerta(
     id SERIAL PRIMARY KEY,
