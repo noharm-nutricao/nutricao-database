@@ -649,7 +649,7 @@ CREATE TABLE demo.nutricional_alerta (
   nratendimento   BIGINT NOT NULL REFERENCES demo.pessoa(nratendimento),
   tipo            VARCHAR(5) CHECK (tipo IN ('lab','clin','rx')),
   descricao       TEXT,
-  severidade      VARCHAR(10) CHECK (severidade IN ('amarelo','laranja','vermelho')),
+  severidade      VARCHAR(10) CHECK (severidade IN ('md','al','cr')),
   ativo           BOOLEAN DEFAULT true,
   created_at      TIMESTAMPTZ DEFAULT now(),
   reconhecido     BOOLEAN DEFAULT false,

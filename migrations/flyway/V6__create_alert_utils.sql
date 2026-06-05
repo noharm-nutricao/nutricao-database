@@ -107,6 +107,15 @@ ALTER COLUMN reconhecido_por DROP NOT NULL;
 ALTER TABLE demo.nutricional_alerta
 DROP CONSTRAINT nutricional_alerta_severidade_check;
 
+UPDATE demo.nutricional_alerta
+SET severidade = CASE lower(trim(severidade))
+    WHEN 'amarelo' THEN 'md'
+    WHEN 'laranja' THEN 'al'
+    WHEN 'vermelho' THEN 'cr'
+    ELSE lower(trim(severidade))
+END
+WHERE severidade IS NOT NULL;
+
 -- alterado constraint de check para severidade
 ALTER TABLE demo.nutricional_alerta
 ADD CONSTRAINT nutricional_alerta_severidade_check_updated
