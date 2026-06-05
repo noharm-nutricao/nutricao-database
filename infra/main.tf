@@ -96,6 +96,7 @@ resource "aws_instance" "database" {
   ]
 
   root_block_device {
+    # Leave the size unset by default so EC2 uses the AMI snapshot minimum.
     volume_size = var.database_volume_size
     volume_type = "gp3"
   }

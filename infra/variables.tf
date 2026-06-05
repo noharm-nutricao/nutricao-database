@@ -23,7 +23,7 @@ variable "database_instance_type" {
 
 variable "database_volume_size" {
   type    = number
-  default = 20
+  default = null
 }
 
 variable "db_name" {
