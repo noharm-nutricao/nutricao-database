@@ -110,6 +110,8 @@ jobs:
             fi
 
             sudo dnf install -y unzip docker
+            sudo dnf clean all
+            sudo rm -rf /var/cache/dnf
 
             sudo systemctl enable docker
             sudo systemctl start docker
@@ -118,11 +120,15 @@ jobs:
               sleep 2
             done
 
+            echo "Espaco em disco antes do deploy:"
+            df -h
+
             sudo rm -rf /opt/nitra/database
             sudo mkdir -p /opt/nitra/database
             sudo mkdir -p /opt/nitra/postgres-data
 
             sudo unzip -q /tmp/database.zip -d /opt/nitra/database
+            sudo rm -f /tmp/database.zip
 
             cd /opt/nitra/database
 
@@ -145,11 +151,11 @@ jobs:
                 -d '${{ secrets.DB_NAME }}' && break || sleep 5
             done
 
-            sudo docker build -t nitra-flyway .
-
             sudo docker run --rm \
               --network host \
-              nitra-flyway \
+              -v /opt/nitra/database/migrations/flyway:/flyway/sql:ro \
+              -v /opt/nitra/database/flyway/flyway.conf:/flyway/conf/flyway.conf:ro \
+              flyway/flyway:10 \
               -url=jdbc:postgresql://localhost:5432/${{ secrets.DB_NAME }} \
               -user=${{ secrets.DB_USER }} \
               -password=${{ secrets.DB_PASSWORD }} \
