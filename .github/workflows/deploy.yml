@@ -149,9 +149,10 @@ jobs:
             sudo dnf clean all
             sudo rm -rf /var/cache/dnf
 
-            ROOT_PARTITION=$(findmnt -n -o SOURCE /)
+            ROOT_PARTITION=$(readlink -f "$(findmnt -n -o SOURCE /)")
             ROOT_DISK="/dev/$(lsblk -no PKNAME "$ROOT_PARTITION")"
-            ROOT_PARTITION_NUMBER=$(lsblk -no PARTN "$ROOT_PARTITION")
+            ROOT_PARTITION_BASENAME=$(basename "$ROOT_PARTITION")
+            ROOT_PARTITION_NUMBER=$(echo "$ROOT_PARTITION_BASENAME" | sed -E 's/^.*p?([0-9]+)$/\1/')
 
             sudo growpart "$ROOT_DISK" "$ROOT_PARTITION_NUMBER" || true
 
