@@ -12,6 +12,7 @@ permissions:
 env:
   AWS_REGION: us-east-2
   PROJECT_NAME: nitra-database
+  DATABASE_ROOT_VOLUME_SIZE_GB: 16
 
 jobs:
   deploy-database:
@@ -71,6 +72,41 @@ jobs:
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
+      - name: Garantir espaco no volume raiz da EC2
+        run: |
+          VOLUME_ID=$(aws ec2 describe-instances \
+            --instance-ids "${{ steps.ec2.outputs.instance_id }}" \
+            --query "Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId" \
+            --output text)
+
+          CURRENT_SIZE=$(aws ec2 describe-volumes \
+            --volume-ids "$VOLUME_ID" \
+            --query "Volumes[0].Size" \
+            --output text)
+
+          echo "Volume raiz atual: ${CURRENT_SIZE} GiB"
+
+          if [ "$CURRENT_SIZE" -lt "${{ env.DATABASE_ROOT_VOLUME_SIZE_GB }}" ]; then
+            aws ec2 modify-volume \
+              --volume-id "$VOLUME_ID" \
+              --size "${{ env.DATABASE_ROOT_VOLUME_SIZE_GB }}"
+
+            for i in {1..40}; do
+              MOD_STATE=$(aws ec2 describe-volumes-modifications \
+                --volume-ids "$VOLUME_ID" \
+                --query "VolumesModifications[0].ModificationState" \
+                --output text)
+
+              echo "Estado da expansao do volume: $MOD_STATE"
+
+              if [ "$MOD_STATE" = "optimizing" ] || [ "$MOD_STATE" = "completed" ]; then
+                break
+              fi
+
+              sleep 15
+            done
+          fi
+
       - name: Aguardar SSH ficar disponível
         run: |
           for i in {1..30}; do
@@ -109,9 +145,22 @@ jobs:
               sudo tail -n 200 /var/log/cloud-init-output.log || true
             fi
 
-            sudo dnf install -y unzip docker
+            sudo dnf install -y unzip docker cloud-utils-growpart xfsprogs
             sudo dnf clean all
             sudo rm -rf /var/cache/dnf
+
+            ROOT_PARTITION=$(findmnt -n -o SOURCE /)
+            ROOT_DISK="/dev/$(lsblk -no PKNAME "$ROOT_PARTITION")"
+            ROOT_PARTITION_NUMBER=$(lsblk -no PARTN "$ROOT_PARTITION")
+
+            sudo growpart "$ROOT_DISK" "$ROOT_PARTITION_NUMBER" || true
+
+            ROOT_FS_TYPE=$(findmnt -n -o FSTYPE /)
+            if [ "$ROOT_FS_TYPE" = "xfs" ]; then
+              sudo xfs_growfs -d /
+            elif [ "$ROOT_FS_TYPE" = "ext4" ]; then
+              sudo resize2fs "$ROOT_PARTITION"
+            fi
 
             sudo systemctl enable docker
             sudo systemctl start docker
