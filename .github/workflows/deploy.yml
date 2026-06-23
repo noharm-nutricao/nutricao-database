@@ -104,10 +104,16 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.ec2.outputs.public_ip }} << 'EOF'
             set -e
 
+            sudo cloud-init status --wait
+
             sudo dnf install -y unzip docker
 
             sudo systemctl enable docker
             sudo systemctl start docker
+
+            until sudo docker info >/dev/null 2>&1; do
+              sleep 2
+            done
 
             sudo rm -rf /opt/nitra/database
             sudo mkdir -p /opt/nitra/database
@@ -117,19 +123,18 @@ jobs:
 
             cd /opt/nitra/database
 
-            sudo docker network create nitra-network || true
-
-            sudo docker rm -f nitra-postgres || true
-
-            sudo docker run -d \
-              --name nitra-postgres \
-              --network nitra-network \
-              -p 5432:5432 \
-              -e POSTGRES_DB='${{ secrets.DB_NAME }}' \
-              -e POSTGRES_USER='${{ secrets.DB_USER }}' \
-              -e POSTGRES_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-              -v /opt/nitra/postgres-data:/var/lib/postgresql/data \
-              postgres:16
+            if sudo docker ps -a --format '{{.Names}}' | grep -Fxq nitra-postgres; then
+              sudo docker start nitra-postgres >/dev/null || true
+            else
+              sudo docker run -d \
+                --name nitra-postgres \
+                -p 5432:5432 \
+                -e POSTGRES_DB='${{ secrets.DB_NAME }}' \
+                -e POSTGRES_USER='${{ secrets.DB_USER }}' \
+                -e POSTGRES_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+                -v /opt/nitra/postgres-data:/var/lib/postgresql/data \
+                postgres:16
+            fi
 
             for i in {1..30}; do
               sudo docker exec nitra-postgres pg_isready \
@@ -140,9 +145,9 @@ jobs:
             sudo docker build -t nitra-flyway .
 
             sudo docker run --rm \
-              --network nitra-network \
+              --network host \
               nitra-flyway \
-              -url=jdbc:postgresql://nitra-postgres:5432/${{ secrets.DB_NAME }} \
+              -url=jdbc:postgresql://localhost:5432/${{ secrets.DB_NAME }} \
               -user=${{ secrets.DB_USER }} \
               -password=${{ secrets.DB_PASSWORD }} \
               migrate
