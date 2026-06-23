@@ -104,7 +104,10 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.ec2.outputs.public_ip }} << 'EOF'
             set -e
 
-            sudo cloud-init status --wait
+            if ! sudo cloud-init status --wait; then
+              echo "cloud-init terminou com erro; seguindo com o deploy via SSH para nao bloquear o banco existente."
+              sudo tail -n 200 /var/log/cloud-init-output.log || true
+            fi
 
             sudo dnf install -y unzip docker
 
